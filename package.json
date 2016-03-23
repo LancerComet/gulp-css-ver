@@ -1,6 +1,6 @@
 {
   "name": "gulp-css-ver",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Add version for pictures in css file.",
   "main": "index.js",
   "dependencies": {
