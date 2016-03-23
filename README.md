@@ -27,5 +27,5 @@ gulp.task("stylus-to-css", function () {
 ```
 
 ## License
-
 MIT.
+© 2016 LancerComet.
