@@ -71,8 +71,6 @@ module.exports = function (distPath, publicPath, version) {
                     var urlPath = value.match(appConfig.picRegExp)[0];
                     urlPath = urlPath.substr(1, urlPath.length - 2);  // 获取图片在 CSS 中的地址.
                     
-                    console.log(urlPath)
-                    
                     if (urlPath.match(appConfig.httpRegExp)) { return; }  // 如果是 http 的地址则跳过.
 
                     var picPath = distPath + urlPath;
