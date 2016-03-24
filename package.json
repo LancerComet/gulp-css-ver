@@ -1,7 +1,7 @@
 {
   "name": "gulp-css-ver",
   "version": "1.0.2",
-  "description": "Add version for pictures in css file.",
+  "description": "Add md5-version-querying-param that based on pictrues files to pictures requirement role 'url()' in your css files.",
   "main": "index.js",
   "dependencies": {
     "gulp-util": "^3.0.7",
