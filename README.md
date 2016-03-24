@@ -8,6 +8,8 @@ cssVer(distPath, secDistPath, versionName);
 
 If you provided a `versionName`, all querying params in `url(xxx?@queryingParam)` will be replaced with `versionName`. 
 
+
+## Example
 ```
 var gulp = require("gulp");
 var rename = require("gulp-rename");
