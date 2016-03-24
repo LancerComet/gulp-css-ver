@@ -1,0 +1,12 @@
+.test-01 {
+  background-image: url("./pics/01.jpg?5e9b50");
+}
+.test-02 {
+  background: url("./pics/02.jpg?7a9735") no-repeat cover;
+}
+.thumb .test-01 {
+  background-image: url("./pics/01.jpg?5e9b50");
+}
+.thumb .test-02 {
+  background-image: url("./pics/02.jpg?7a9735");
+}

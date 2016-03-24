@@ -21,7 +21,7 @@ module.exports = function (distPath, publicPath, version) {
 
     // Error Handler.
     if (!distPath) {
-        throw new PluginError(appConfig.PLUGIN_NAME, "Please provide what the css file path is. 请指定 CSS 文件的生成目录以便读取图片并生成版本号.");
+        throw new PluginError(appConfig.PLUGIN_NAME, "Please provide what the css file path is. \n请指定 CSS 文件的生成目录以便读取图片并生成版本号.");
     }
 
     var stream = through.obj(function (file, enc, cb) {
@@ -34,9 +34,6 @@ module.exports = function (distPath, publicPath, version) {
         if (file.isBuffer()) {
             // 用于查询 url().
             var regExp = /(^|)\s*url\s*\(["|'][0-9a-zA-Z+\-*%/\\<>.,;:_&^%$#@!]*\.[0-9a-zA-Z-+/\\<>.,;:_]*.[\)]/gi;
-
-            // 用于替换字符串.
-            var replaceRegExp = /["|']\)/;
 
             var fileContent = file.contents.toString();
             var matchedResult = fileContent.match(regExp);
@@ -57,7 +54,7 @@ module.exports = function (distPath, publicPath, version) {
 
             // Definition: 指定版本号的情况.
             function withVersion () {
-                console.log("You provide a version code, all pictures's querying param will be replaced. \n 您指定了一个版本号，所有图片地址都将替换为您的版本号.");
+                console.log("You provide a version code, all pictures's querying param will be replaced. \n您指定了一个版本号，所有图片地址都将替换为您的版本号.");
                 matchedResult.forEach(function (value, index, array) {
                     var urlPath = value.match(appConfig.picRegExp)[0];
                     urlPath = urlPath.substr(1, urlPath.length - 2);
@@ -73,14 +70,15 @@ module.exports = function (distPath, publicPath, version) {
                 matchedResult.forEach(function (value, index, array) {
                     var urlPath = value.match(appConfig.picRegExp)[0];
                     urlPath = urlPath.substr(1, urlPath.length - 2);  // 获取图片在 CSS 中的地址.
-
+                    
+                    console.log(urlPath)
+                    
                     if (urlPath.match(appConfig.httpRegExp)) { return; }  // 如果是 http 的地址则跳过.
 
                     var picPath = distPath + urlPath;
                     picPath = picPath.replace(/\/.\//gi, "/");  // 将 CSS 图片地址与 distPath 拼合.
                     picPath = picPath.replace(/\/[0-9a-zA-Z+\-*_!@#$%^&()]*\.\.\//gi, "/");  // 处理 "../" 上级相对路径.
-
-
+                    
                     // 如果图片不在 dist 目录, 则尝试从 public 目录中读取.
                     if (!fs.existsSync(picPath)) {
                         var picPublicPath = publicPath + urlPath;
@@ -88,9 +86,13 @@ module.exports = function (distPath, publicPath, version) {
                         picPublicPath = picPublicPath.replace(/\/[0-9a-zA-Z+\-*_!@#$%^&()]*\.\.\//gi, "/");  // 处理 "../" 上级相对路径.
                         picPath = picPublicPath;
                     }
-
+                    
                     const picHash = createPicHash(picPath);  // 获取图片的 MD5 值.
-                    fileContent = fileContent.replace(urlPath, urlPath + "?" + picHash);  // 使用版本号.                    fileContent = fileContent
+                    const replaceRegexp = new RegExp(urlPath + '["|\']', "g");
+                    fileContent = fileContent.replace(replaceRegexp, urlPath + "?" + picHash + "\"");  // 使用版本号.
+                    
+                    // 替换所有的单引号为双引号.
+                    fileContent = fileContent.replace(/'/gi, "\"");
                 });
             }
 
