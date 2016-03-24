@@ -1,6 +1,6 @@
 {
   "name": "gulp-css-ver",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Add md5-version-querying-param that based on pictrues files to pictures requirement role 'url()' in your css files.",
   "main": "index.js",
   "dependencies": {
@@ -10,10 +10,7 @@
   },
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-stylus": "^2.3.1",
-    "gulp-util": "^3.0.7",
-    "md5": "^2.1.0",
-    "through2": "^2.0.1"
+    "gulp-stylus": "^2.3.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
