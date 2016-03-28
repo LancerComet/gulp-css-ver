@@ -3,7 +3,7 @@
  *  # Carry Your World #
  *  ---
  *  gulp-css-ver @ MIT.
- *  Version: 1.0.4.
+ *  Version: 1.0.5.
  */
 
 const through = require("through2");
