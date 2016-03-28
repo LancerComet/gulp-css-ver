@@ -3,6 +3,7 @@
  *  # Carry Your World #
  *  ---
  *  gulp-css-ver @ MIT.
+ *  Version: 1.0.4.
  */
 
 const through = require("through2");
@@ -18,10 +19,26 @@ const appConfig = {
 };
 
 module.exports = function (distPath, publicPath, version) {
+    "use strict";
 
     // Error Handler.
     if (!distPath) {
-        throw new PluginError(appConfig.PLUGIN_NAME, "Please provide what the css file path is. \n请指定 CSS 文件的生成目录以便读取图片并生成版本号.");
+        throw new PluginError(appConfig.PLUGIN_NAME, "Please provide where the css file will be generated. (CSS file path)");
+    }
+    
+    // Swap arguments.
+    if (arguments.length < 3) {
+        version = publicPath;
+    } else {
+        // 后缀缺 "/" 时补全.        
+        if (publicPath.substr(-1) !== "/") {
+            publicPath += "/";
+        }
+    }
+    
+    // 后缀缺 "/" 时补全.
+    if (distPath.substr(-1) !== "/") {
+        distPath += "/";
     }
 
     var stream = through.obj(function (file, enc, cb) {
@@ -54,7 +71,8 @@ module.exports = function (distPath, publicPath, version) {
 
             // Definition: 指定版本号的情况.
             function withVersion () {
-                console.log("You provide a version code, all pictures's querying param will be replaced. \n您指定了一个版本号，所有图片地址都将替换为您的版本号.");
+                gutil.log(appConfig.PLUGIN_NAME + ": You provided the version name \"" + version + "\", all pictures's querying param will be replaced.");
+                // gutil.log(appConfig.PLUGIN_NAME + ": 您指定了一个版本号，所有图片地址都将添加您指定版本号.")
                 matchedResult.forEach(function (value, index, array) {
                     var urlPath = value.match(appConfig.picRegExp)[0];
                     urlPath = urlPath.substr(1, urlPath.length - 2);
@@ -70,13 +88,18 @@ module.exports = function (distPath, publicPath, version) {
                 matchedResult.forEach(function (value, index, array) {
                     var urlPath = value.match(appConfig.picRegExp)[0];
                     urlPath = urlPath.substr(1, urlPath.length - 2);  // 获取图片在 CSS 中的地址.
-                    
-                    if (urlPath.match(appConfig.httpRegExp)) { return; }  // 如果是 http 的地址则跳过.
+
+                    if (urlPath.match(appConfig.httpRegExp)) {
+                        gutil.log(appConfig.PLUGIN_NAME + ": http-url \" " + urlPath + "\" detected, skip adding querying param.");                         
+                        // gutil.log(appConfig.PLUGIN_NAME + ": 检测到 http 图片 \"" + urlPath + "\", 将跳过添加版本号."); 
+                        return;
+                     }  // 如果是 http 的地址则跳过.
 
                     var picPath = distPath + urlPath;
                     picPath = picPath.replace(/\/.\//gi, "/");  // 将 CSS 图片地址与 distPath 拼合.
                     picPath = picPath.replace(/\/[0-9a-zA-Z+\-*_!@#$%^&()]*\.\.\//gi, "/");  // 处理 "../" 上级相对路径.
-                    
+
+
                     // 如果图片不在 dist 目录, 则尝试从 public 目录中读取.
                     if (!fs.existsSync(picPath)) {
                         var picPublicPath = publicPath + urlPath;
@@ -84,7 +107,7 @@ module.exports = function (distPath, publicPath, version) {
                         picPublicPath = picPublicPath.replace(/\/[0-9a-zA-Z+\-*_!@#$%^&()]*\.\.\//gi, "/");  // 处理 "../" 上级相对路径.
                         picPath = picPublicPath;
                     }
-                    
+
                     const picHash = createPicHash(picPath);  // 获取图片的 MD5 值.
                     const replaceRegexp = new RegExp(urlPath + '["|\']', "g");
                     fileContent = fileContent.replace(replaceRegexp, urlPath + "?" + picHash + "\"");  // 使用版本号.
@@ -111,7 +134,8 @@ module.exports = function (distPath, publicPath, version) {
 // Definition: 生成图片 Hash 函数.
 function createPicHash (path) {
     if (!fs.existsSync(path)) {
-        console.log('File "' + path + '" not exist, no md5 will returned.');
+        gutil.log(appConfig.PLUGIN_NAME + ': File "' + path + '" not exist, no md5 will returned.');
+        // gutil.log(appConfig.PLUGIN_NAME + ': 文件 "' + path + '" 不存在, 将跳过版本号添加.');        
         return "";
     }
     return md5(fs.readFileSync(path)).substr(0, 6);
