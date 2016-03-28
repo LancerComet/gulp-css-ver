@@ -26,21 +26,15 @@ module.exports = function (distPath, publicPath, version) {
         throw new PluginError(appConfig.PLUGIN_NAME, "Please provide where the css file will be generated. (CSS file path)");
     }
     
-    // Swap arguments.
-    if (arguments.length < 3) {
-        version = publicPath;
-    } else {
-        // 后缀缺 "/" 时补全.        
-        if (publicPath.substr(-1) !== "/") {
-            publicPath += "/";
-        }
-    }
-    
     // 后缀缺 "/" 时补全.
     if (distPath.substr(-1) !== "/") {
         distPath += "/";
     }
-
+            
+    if (publicPath.substr(-1) !== "/") {
+        publicPath += "/";
+    }
+    
     var stream = through.obj(function (file, enc, cb) {
 
         if (file.isStream()) {
