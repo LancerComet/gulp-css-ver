@@ -6,8 +6,8 @@ cssVer(distDirName, secDistDirName, versionName);
 
 `distDirName` is where the css files will be generated. Gulp-css-ver will try to read all pictrues that are required in css files and root path are based on `distDirName` firstly. Gulp-css-ver will try to read these picture files in `secDistDirName` if there are no these required-pictrue in folder `distDirName`.
 
-Please note that `distDirName` is supposed in **rootpath** of your project. 
-For example, if your css files is in "PROJECT_DIR/public", then you should set `distDirName` to `public`.
+Please note that `distDirName` is relative to **rootpath** of your project. 
+For example, if your css files is in "PROJECT_DIR/public/index", then you should set `distDirName` to `public/index`.
 
 If you provided a `versionName`, all querying params in `url(xxx?@queryingParam)` will be replaced with `versionName`. 
 
@@ -30,10 +30,10 @@ gulp.task("stylus-to-css", function () {
             .pipe(autoprefixer({
                 browsers: ['> 1%', 'last 3 versions', 'Firefox ESR', "ie 8", "ie 9"]
             }))
-            .pipe(cssVer("dist", "public"))
+            .pipe(cssVer("public/index", "dist/index"))
             .pipe(rename("bundle.min.css"))
             .pipe(sourcemap.write("."))
-            .pipe(gulp.dest(distDirName));  // dist.
+            .pipe(gulp.dest("./public/index"));  // dist.
 });
 ```
 

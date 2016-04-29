@@ -3,7 +3,7 @@
  *  # Carry Your World #
  *  ---
  *  gulp-css-ver @ MIT.
- *  Version: 1.0.7.
+ *  Version: 1.0.8.
  */
 
 const through = require("through2");
@@ -20,26 +20,31 @@ const appConfig = {
 
 module.exports = function (distPath, publicPath, version) {
     "use strict";
-    
-    distPath = "../../../" + distPath;  // Relative path to project rootpath.
-    publicPath = "../../.." + publicPath;  // Relative path to project rootpath.
 
     // Error Handler.
     if (!distPath) {
         throw new PluginError(appConfig.PLUGIN_NAME, "Please provide where the css file will be generated. (CSS file path)");
     }
-    
+
+    // 处理 publicPath.
     publicPath = publicPath || "";
-    
-    // 后缀缺 "/" 时补全.
+
+    if (publicPath) {
+        publicPath = __dirname + "/../../" + publicPath;  // Relative path to project rootpath.
+
+        if (publicPath.substr(-1) !== "/") {
+            publicPath = publicPath + "/"
+        }
+    }
+
+    // 处理 distPath 的绝对路径.
+    distPath = __dirname + "/../../" + distPath;  // Relative path to project rootpath.
+
+    // 尾部补全 "/".
     if (distPath.substr(-1) !== "/") {
-        distPath += "/";
+        distPath = distPath + "/"
     }
-            
-    if (publicPath && publicPath.substr(-1) !== "/") {
-        publicPath += "/";
-    }
-    
+
     var stream = through.obj(function (file, enc, cb) {
 
         if (file.isStream()) {
@@ -96,8 +101,6 @@ module.exports = function (distPath, publicPath, version) {
 
                     var picPath = distPath + urlPath;
                     picPath = picPath.replace(/\/.\//gi, "/");  // 将 CSS 图片地址与 distPath 拼合.
-                    picPath = picPath.replace(/\/[0-9a-zA-Z+\-*_!@#$%^&()]*\.\.\//gi, "/");  // 处理 "../" 上级相对路径.
-
 
                     // 如果图片不在 dist 目录, 则尝试从 public 目录中读取.
                     if (!fs.existsSync(picPath)) {
