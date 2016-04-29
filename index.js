@@ -26,12 +26,14 @@ module.exports = function (distPath, publicPath, version) {
         throw new PluginError(appConfig.PLUGIN_NAME, "Please provide where the css file will be generated. (CSS file path)");
     }
     
+    publicPath = publicPath || "";
+    
     // 后缀缺 "/" 时补全.
     if (distPath.substr(-1) !== "/") {
         distPath += "/";
     }
             
-    if (publicPath.substr(-1) !== "/") {
+    if (publicPath && publicPath.substr(-1) !== "/") {
         publicPath += "/";
     }
     
