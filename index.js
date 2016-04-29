@@ -3,7 +3,7 @@
  *  # Carry Your World #
  *  ---
  *  gulp-css-ver @ MIT.
- *  Version: 1.0.5.
+ *  Version: 1.0.7.
  */
 
 const through = require("through2");
@@ -20,6 +20,9 @@ const appConfig = {
 
 module.exports = function (distPath, publicPath, version) {
     "use strict";
+    
+    distPath = "../../../" + distPath;  // Relative path to project rootpath.
+    publicPath = "../../.." + publicPath;  // Relative path to project rootpath.
 
     // Error Handler.
     if (!distPath) {
