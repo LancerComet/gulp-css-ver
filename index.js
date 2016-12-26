@@ -1,9 +1,10 @@
-/*
+/**
  *  Gulp CSS Version By © 2016 LancerComet at 17:15, 2016.03.23.
  *  # Carry Your World #
  *  ---
- *  gulp-css-ver @ MIT.
- *  Version: 1.0.8.
+ *  @license: MIT
+ *  @author: LancerComet
+ *  @version: 1.0.9
  */
 
 const through = require("through2");
@@ -15,7 +16,7 @@ const md5 = require('md5');
 const appConfig = {
     PLUGIN_NAME: "gulp-css-ver",
     picRegExp: /["|'].*.["|']/gi,
-    httpRegExp: /^((https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/
+    httpRegExp: /^(((https|http|ftp|rtsp|mms)?:\/\/)|\/\/)[^\s]+/
 };
 
 module.exports = function (distPath, publicPath, version) {
@@ -23,7 +24,7 @@ module.exports = function (distPath, publicPath, version) {
 
     // Error Handler.
     if (!distPath) {
-        throw new PluginError(appConfig.PLUGIN_NAME, "Please provide where the css file will be generated. (CSS file path)");
+        throw new PluginError(appConfig.PLUGIN_NAME, "Please provide where the css files are going to be generated. (CSS file path)");
     }
 
     // 处理 publicPath.
@@ -61,11 +62,7 @@ module.exports = function (distPath, publicPath, version) {
 
             // 如果没有指定版本号, 则遍历所有图片并生成 hash 后, 将 hash 作为每个图片的访问后缀参数.
             // 如果指定了版本号, 则直接全局替换.
-            if (!version) {
-                withoutVersion();
-            } else {
-                withVersion();
-            }
+            version ? withVersion() : withoutVersion();
 
             // 将结果转为 Buffer 后输出为结果.
             file.contents = new Buffer(fileContent);
@@ -73,7 +70,9 @@ module.exports = function (distPath, publicPath, version) {
 
             /* ============== Definition goes below. ============== */
 
-            // Definition: 指定版本号的情况.
+            /**
+             * Version is provided.
+             */
             function withVersion () {
                 gutil.log(appConfig.PLUGIN_NAME + ": You provided the version name \"" + version + "\", all pictures's querying param will be replaced.");
                 // gutil.log(appConfig.PLUGIN_NAME + ": 您指定了一个版本号，所有图片地址都将添加您指定版本号.")
@@ -87,17 +86,20 @@ module.exports = function (distPath, publicPath, version) {
                 });
             }
 
-            // Definition: 没有版本号的情况. 遍历所有图片后生成 hash 并替换.
+            /**
+             * Version isn't provided, map all picture files and generate hashes.
+             */
             function withoutVersion () {
                 matchedResult.forEach(function (value, index, array) {
                     var urlPath = value.match(appConfig.picRegExp)[0];
                     urlPath = urlPath.substr(1, urlPath.length - 2);  // 获取图片在 CSS 中的地址.
 
+                    // Skip absolute url.
                     if (urlPath.match(appConfig.httpRegExp)) {
                         gutil.log(appConfig.PLUGIN_NAME + ": http-url \" " + urlPath + "\" detected, skip adding querying param.");                         
                         // gutil.log(appConfig.PLUGIN_NAME + ": 检测到 http 图片 \"" + urlPath + "\", 将跳过添加版本号."); 
                         return;
-                     }  // 如果是 http 的地址则跳过.
+                     }
 
                     var picPath = distPath + urlPath;
                     picPath = picPath.replace(/\/.\//gi, "/");  // 将 CSS 图片地址与 distPath 拼合.
@@ -121,10 +123,7 @@ module.exports = function (distPath, publicPath, version) {
 
         }
 
-        // 确保文件进入下一个 gulp 插件
         this.push(file);
-
-        // 告诉 stream 引擎，我们已经处理完了这个文件
         cb();
     });
 
@@ -132,8 +131,12 @@ module.exports = function (distPath, publicPath, version) {
 };
 
 
-
-// Definition: 生成图片 Hash 函数.
+/**
+ * Generate HASH String.
+ * 
+ * @param {string} path The path of target file.
+ * @returns {string}
+ */
 function createPicHash (path) {
     if (!fs.existsSync(path)) {
         gutil.log(appConfig.PLUGIN_NAME + ': File "' + path + '" not exist, no md5 will returned.');
